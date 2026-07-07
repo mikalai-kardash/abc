@@ -1,9 +1,9 @@
-#include <bits/time.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include "measure.h"
 #define DATA_SIZE 1024 * 1024
 #define LIMIT (float) DATA_SIZE / 2 - 1
 
@@ -30,17 +30,6 @@ void init_ordered(float *a, int length) {
     for (int i = 0; i < length; i++) {
         a[i] = (float) i;
     }
-}
-
-#define MEASURE(fn, elapsed) {                              \
-    struct timespec start, end;                             \
-    clock_gettime(CLOCK_MONOTONIC, &start);                 \
-    fn;                                                     \
-    clock_gettime(CLOCK_MONOTONIC, &end);                   \
-    elapsed =                                               \
-        (end.tv_sec - start.tv_sec) * 1000.0 +              \
-        (end.tv_nsec - start.tv_nsec) / (1000.0 * 1000.0)   \
-    ;                                                       \
 }
 
 struct stats {
@@ -85,15 +74,6 @@ void calculate_stats(float *results, int length, struct stats *st) {
     st->p95max = p95max;
     st->p95min = p95min;
 }
-
-#define RUN(fn, results) {              \
-    for (int i = 0; i < 128; i++) {     \
-        float elapsed_ms;               \
-        MEASURE(fn, elapsed_ms);        \
-        results[i] = elapsed_ms;        \
-    }                                   \
-}
-
 
 int use_random = 0;
 
