@@ -61,11 +61,9 @@ int clock_gettime(clockid_t type, struct timespec *tp) {
     ;                                                       \
 }
 
-#define RUN(fn, results) {              \
-    for (int i = 0; i < 128; i++) {     \
-        float elapsed_ms;               \
-        MEASURE(fn, elapsed_ms);        \
-        results[i] = elapsed_ms;        \
+#define RUN(fn, results, n) {           \
+    for (int i = 0; i < n; i++) {       \
+        MEASURE(fn, results[i]);        \
     }                                   \
 }
 

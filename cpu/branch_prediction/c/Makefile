@@ -1,2 +1,5 @@
-build: bp.c
-	gcc -Wall -Wextra -lm -o bp bp.c
+SRCS = $(wildcard *.c)
+TARGET = bp
+
+build: $(SRCS)
+	gcc -Wall -Wextra -lm -o $(TARGET) $(SRCS)
