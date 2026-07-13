@@ -1,5 +1,13 @@
-SRCS = $(wildcard *.c)
-TARGET = bp
+LIB_STATS := $(SDK_LIB_DIR)/stats
+SRCS    := bp.c
+TARGET  := bp
+CCFLAGS := -Wall -Wextra -I$(LIB_STATS)
+LDFLAGS := -L$(LIB_STATS) -lsdk_stats -lm
 
-build: $(SRCS)
-	gcc -Wall -Wextra -lm -o $(TARGET) $(SRCS)
+
+all: $(TARGET)
+
+$(TARGET): $(SRCS)
+	gcc -o $(TARGET) $(SRCS) $(CCFLAGS) $(LDFLAGS)
+
+clean:
