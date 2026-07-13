@@ -7,7 +7,7 @@ LINK    := -L$(LIB_STATS) -lsdk_stats -lpthread -lm
 
 all: $(TARGET)
 
-$(TARGET):
+$(TARGET): fs.c
 	gcc -o $@ fs.c $(INCLUDE) $(LINK)
 
 clean:

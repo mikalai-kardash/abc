@@ -43,16 +43,16 @@ int GOOD_run(void *arg) {
 
 
 // OPTIONS
-
 int use_multithreading = 0;
-int use_good_solution = 0;
-int use_padding = 0;
-size_t num_of_threads = 1;
-size_t num_of_runs = 32;
+int use_good_solution  = 0;
+int use_padding        = 0;
+size_t num_of_threads  = 1;
+size_t num_of_runs     = 32;
+size_t byte_padding    = 1;
 
 int process_options(int argc, char *argv[argc + 1]) {
     int opt;
-    while ((opt = getopt(argc, argv, "mgt:r:p")) != -1) {
+    while ((opt = getopt(argc, argv, "mgt:r:p:b:")) != -1) {
         switch (opt) {
             case 'm':
                 use_multithreading = 1;
@@ -70,6 +70,9 @@ int process_options(int argc, char *argv[argc + 1]) {
                 break;
             case 'p':
                 use_padding = 1;
+                break;
+            case 'b':
+                byte_padding = atoi(optarg);
                 break;
             default:
                 return -1;
@@ -92,14 +95,21 @@ typedef int (*run_t) (void);
 
 int calculate(size_t num_of_threads, thrd_start_t fn) {
     const int part = ARR_SIZE / num_of_threads;
-    int *counters = (int *) malloc(num_of_threads * sizeof(int));
+    int *counters = (int *) malloc(num_of_threads * sizeof(int) * byte_padding);
     struct thread_args *ta = (struct thread_args *) malloc(num_of_threads * sizeof(struct thread_args));
     thrd_t *t = (thrd_t *) malloc(num_of_threads * sizeof(thrd_t));
 
     for (size_t i = 0; i < num_of_threads; i++) {
-        counters[i] = 0;
+        counters[i * byte_padding] = 0;
+        // this prints addresses of counters and distance in bytes in between.
+        // printf(
+                // "counter %zu: %p (%ld)\n", 
+                // i, 
+                // (void *)(counters + i * byte_padding), 
+                // (void *)(counters + i * byte_padding) - (void *)(counters)
+        // );
 
-        (ta + i)->n = (void *)(counters + i); 
+        (ta + i)->n = (void *)(counters + i * byte_padding); 
         (ta + i)->arr = (void *)(arr + i*part); 
         (ta + i)->count = part; 
 
@@ -151,12 +161,13 @@ int main(int argc, char *argv[argc + 1]) {
     }
 
     printf(
-            "%s, threads: %zu, number of runs: %zu\n_\n", 
+            "%s, threads: %zu, number of runs: %zu, padding: %zu bytes\n_\n", 
             use_multithreading ? 
                 (use_good_solution ? "multi-threaded (GOOD)" : "multi-threaded (BAD)") : 
                 "single-threaded",
             use_multithreading ? num_of_threads : 1,
-            num_of_runs
+            num_of_runs,
+            (byte_padding * 4)
     );
 
     run_t action;
@@ -169,8 +180,8 @@ int main(int argc, char *argv[argc + 1]) {
     struct stats st;
     EVAL(
             action(), 
-            num_of_runs,           // number of runs
-            st                             // statistics
+            num_of_runs,
+            st // statistics
     );
 
     printf(
