@@ -11,3 +11,4 @@ $(TARGET): $(SRCS)
 	gcc -o $(TARGET) $(SRCS) $(CCFLAGS) $(LDFLAGS)
 
 clean:
+	$(RM) bp bp.exe

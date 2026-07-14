@@ -2,7 +2,34 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <threads.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+    #warning "on windows, replacing threads.h with windows-specific impl."
+
+    #include <pthread.h>
+    #include <stdint.h>
+
+    #define thrd_t pthread_t
+    #define thrd_success 0
+    #define thrd_error 1
+    typedef  int (*thrd_start_t) (void *);
+
+    static inline int thrd_create(thrd_t *th, int (*run_t)(void *), void *arg) {
+        return (pthread_create(th, NULL, (void *(*)(void *))(uintptr_t)run_t, arg) == 0) 
+            ? thrd_success : thrd_error;
+    }
+
+    static inline int thrd_join(thrd_t th, int *res) {
+        void *pth;
+        if (pthread_join(th, &pth) != 0) return thrd_error;
+        if (res) *res = (int)(intptr_t)pth;
+        return thrd_success;
+    }
+
+#else
+    #include <threads.h>
+#endif
+
 #include <unistd.h>
 #include "measure.h"
 #include "stats.h"

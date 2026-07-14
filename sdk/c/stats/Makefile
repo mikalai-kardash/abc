@@ -14,4 +14,4 @@ $(TARGET): $(OBJS)
 	ar rcs $@ $(OBJS)
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	$(RM) *.o $(TARGET)

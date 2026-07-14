@@ -2,12 +2,14 @@ TARGET := fs
 
 LIB_STATS := $(SDK_LIB_DIR)/stats
 
-INCLUDE := -Wall -Wextra -I$(LIB_STATS)
-LINK    := -L$(LIB_STATS) -lsdk_stats -lpthread -lm
+CCFLAGS := -Wall -Wextra -I"$(LIB_STATS)"
+LDFLAGS := -lsdk_stats -lpthread -lm
+LLFLAGS := -L"$(LIB_STATS)"
 
 all: $(TARGET)
 
 $(TARGET): fs.c
-	gcc -o $@ fs.c $(INCLUDE) $(LINK)
+	gcc $(CCFLAGS) $(LLFLAGS) fs.c $(LDFLAGS) -o $@
 
 clean:
+	$(RM) fs fs.exe
